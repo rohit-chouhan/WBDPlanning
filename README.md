@@ -1,2 +1,1 @@
-# WBDPlanning
-SAC Custom Widget for Deloitte Warner Bros Project
+# Commercial Use only © Deloitte & Warner Bros Discovery

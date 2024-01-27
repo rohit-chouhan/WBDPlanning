@@ -1,0 +1,133 @@
+{
+  "id": "com.rohitchouhan.wbdplanning",
+  "version": "1.0.0",
+  "name": "WBD Planning",
+  "description": "A Planning Widget of Warner Bros Discovery Project",
+  "newInstancePrefix": "WBDPlanning",
+  "vendor": "Deloitte | rohchouhan@deloitte.com",
+  "eula": "Deloitte",
+  "license": "MIT",
+  "icon": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.0/dist/icon.png",
+  "imports": [
+    "datasource",
+    "planning-model"
+  ],
+  "webcomponents": [
+    {
+      "kind": "main",
+      "tag": "com-rohitchouhan-wbdplanning",
+      "url": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.0/dist/WBDPlanning.bundle.js",
+      "integrity": "",
+      "ignoreIntegrity": true
+    }
+  ],
+  "properties": {
+    "modelId": {
+      "description": "The Model ID to be used during jobs.",
+      "type": "string"
+    },
+    "dataMapping": {
+      "description": "Base for storing master data mapping.",
+      "type": "Selection"
+    },
+    "dataDefaultValues": {
+      "description": "Base for storing default values for master data mapping.",
+      "type": "Selection"
+    }
+  },
+  "methods": {
+    "setModel": {
+      "description": "Sets up the default model for jobs.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "type": "string",
+          "description": "Technical ID of the model."
+        }
+      ],
+      "body": "this.modelId = modelId;"
+    },
+    "setDataMapping": {
+      "description": "Sets up the mapping for master data.",
+      "parameters": [
+        {
+          "name": "dataMapping",
+          "type": "Selection",
+          "description": "Mapping selection object."
+        }
+      ],
+      "body": "this.dataMapping = dataMapping;"
+    },
+    "setDataDefaultValues": {
+      "description": "Sets up default values mapping for master data.",
+      "parameters": [
+        {
+          "name": "dataDefaultValues",
+          "type": "Selection",
+          "description": "Mapping selection object."
+        }
+      ],
+      "body": "this.dataDefaultValues = dataDefaultValues;"
+    },
+    "setAutoId": {
+      "description": "Get auto generated id based on latest data",
+      "parameters": [
+        {
+          "name": "type",
+          "type": "boolean"
+        }
+      ]
+    },
+    "getProjectAutoId": {
+      "returnType": "string[]",
+      "description": "Get auto generated id based on latest data",
+      "parameters": [
+        {
+          "name": "limit",
+          "type": "integer"
+        },
+        {
+          "name": "prefix",
+          "type": "string"
+        }
+      ]
+    },
+    "getAssetAutoId": {
+      "returnType": "string[]",
+      "description": "Get auto generated id based on latest data",
+      "parameters": [
+        {
+          "name": "limit",
+          "type": "integer"
+        },
+        {
+          "name": "prefix",
+          "type": "string"
+        }
+      ]
+    },
+    "getMasterData": {
+      "returnType": "Selection[]",
+      "description": "Get auto generated id based on latest data",
+      "parameters": [
+        {
+          "name": "dimensionId",
+          "type": "string"
+        },
+        {
+          "name": "filters",
+          "type": "string"
+        }
+      ]
+    },
+    "parseCSV": {
+      "returnType": "Selection[]",
+      "description": "Get uploaded master data"
+    },
+    "uploadData": {
+      "returnType": "boolean",
+      "description": "Upload data"
+    }
+  },
+  "events": {}
+}
