@@ -1,0 +1,9 @@
+# Ignore all files and folders
+/*
+
+# Allow the specified ones
+!/dist/
+!/LICENSE
+!/README.md
+!WBDPlanning.json
+!.gitignore
