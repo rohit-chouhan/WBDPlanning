@@ -17,8 +17,8 @@
       "kind": "main",
       "tag": "com-rohitchouhan-wbdplanning",
       "url": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.1/dist/WBDPlanning.bundle.js",
-      "integrity": "",
-      "ignoreIntegrity": true
+      "integrity": "sha256-Kv1tqnzS+zmQUlnyjUbAMfSrZvccna1zvN2YtdOe5ps=",
+      "ignoreIntegrity": false
     }
   ],
   "properties": {
