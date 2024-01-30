@@ -1,13 +1,13 @@
 {
   "id": "com.rohitchouhan.wbdplanning",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "name": "WBD Planning",
   "description": "A Planning Widget of Warner Bros Discovery Project",
   "newInstancePrefix": "WBDPlanning",
   "vendor": "Deloitte | rohchouhan@deloitte.com",
   "eula": "Deloitte",
   "license": "MIT",
-  "icon": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.2/dist/icon.png",
+  "icon": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.3/dist/icon.png",
   "imports": [
     "datasource",
     "planning-model"
@@ -16,8 +16,8 @@
     {
       "kind": "main",
       "tag": "com-rohitchouhan-wbdplanning",
-      "url": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.2/dist/WBDPlanning.bundle.js",
-      "integrity": "sha256-6f2iPP6pIOOH2sptxIS0uzUy+H+2A/WuVH3oTnL6dOA=",
+      "url": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.3/dist/WBDPlanning.bundle.js",
+      "integrity": "sha256-wIu+Pput6+M5vvIphPRkKSkfhYcGHeV2+pkAoMiyC18=",
       "ignoreIntegrity": false
     }
   ],
@@ -108,7 +108,7 @@
     },
     "getMasterData": {
       "returnType": "Selection[]",
-      "description": "Get auto generated id based on latest data",
+      "description": "Return master data based on filter",
       "parameters": [
         {
           "name": "dimensionId",
