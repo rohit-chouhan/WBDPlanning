@@ -1,7 +1,7 @@
 /*!
  * 
  *           Name: WBD Planning
- *           Version: 1.0.3
+ *           Version: 1.0.4
  *           Author: Rohit Chouhan
  *           Linkedin: https://linkedin.com/in/itsrohitchouhan
  *           Copyright: © Deloitte [commercial use only]
