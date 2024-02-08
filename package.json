@@ -1,0 +1,23 @@
+{
+  "name": "wbd-planning",
+  "version": "1.0.4",
+  "description": "Warner Bros Project Custom Widget",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "webpack --config webpack.config.js && node api/Integrity.js",
+    "publish": "git add . && git commit -m \"new version\" && npm version patch && git push origin main && git push --tags"
+  },
+  "author": "Rohit Chouhan",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.7",
+    "@babel/preset-env": "^7.23.7",
+    "babel-loader": "^9.1.3",
+    "webpack-cli": "^5.1.4"
+  }
+}
