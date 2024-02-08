@@ -1,13 +1,13 @@
 {
   "id": "com.rohitchouhan.wbdplanning",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "name": "WBD Planning",
   "description": "A Planning Widget of Warner Bros Discovery Project",
   "newInstancePrefix": "WBDPlanning",
   "vendor": "Deloitte | rohchouhan@deloitte.com",
   "eula": "Deloitte",
   "license": "MIT",
-  "icon": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.4/dist/icon.png",
+  "icon": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.5/dist/icon.png",
   "imports": [
     "datasource",
     "planning-model"
@@ -16,8 +16,8 @@
     {
       "kind": "main",
       "tag": "com-rohitchouhan-wbdplanning",
-      "url": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.4/dist/WBDPlanning.bundle.js",
-      "integrity": "sha256-GQDpTjkZ6vXae3B98iEAY0OCxB3SE99Yql4Bxo0kN3A=",
+      "url": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.5/dist/WBDPlanning.bundle.js",
+      "integrity": "sha256-7G8Yl06sZkGn6ZCqrLjx0ZrgJdGPE1Rc60AGbqP5lts=",
       "ignoreIntegrity": false
     }
   ],
