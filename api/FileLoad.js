@@ -190,11 +190,11 @@ class FileLoad {
         }
     }
 
-    async getApiData(modelId, dimensionId) {
+    async getApiData(modelId, dimensionId, prefix) {
         //const apiUrl = 'https://warner-bros-q.us10.hcs.cloud.sap/api/v1/dataexport/providers/sac/Ctkc4c1pcjs94acu2nb88eqlaa/DIM_ASSETMaster?$orderby=ID%20desc&$top=10&$filter=not%20contains(ID,%27TOTAL%27)&$select=ID';
         //const apiUrl = `${this.URL}/api/v1/dataexport/providers/sac/${modelId}/${dimensionId}Master?$orderby=ID%20desc&$top=10&$filter=not%20contains(ID,%27TOTAL%27)&$select=ID`;
-        var filter = (dimensionId === 'DIM_PROJECT' ? 'ATR_PRJ_ORIGINATING_NETWORK' : 'ATR_AST_PARTICIPATING_NETWORK');
-        const apiUrl = `${this.URL}/api/v1/dataexport/providers/sac/${modelId}/${dimensionId}Master?$orderby=ID%20desc&$top=10&$filter=${filter} ne ''&$select=ID`;
+        var filter = (dimensionId === 'DIM_PROJECT' ? 'ATR_PRJ_ORIGINATING_NETWORK' : 'ATR_AST_PROJECT_ID');
+        const apiUrl = `${this.URL}/api/v1/dataexport/providers/sac/${modelId}/${dimensionId}Master?$orderby=ID desc&$top=10&$filter=${filter} ne '' and startswith(ID, '${prefix}')&$select=ID`;
         // const apiUrl = `${this.URL}/api/v1/dataexport/providers/sac/${modelId}/${dimensionId}Master?$orderby=ID%20desc&$top=10&$filter=startswith(ID,'PP')&$select=ID`;
 
         const headers = {

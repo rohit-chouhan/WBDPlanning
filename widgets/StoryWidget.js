@@ -146,14 +146,22 @@ class WBDPlanning extends HTMLElement {
             "JobSettings": {}
         };
 
+        // console.log("rawdata");
+        // console.log(rawData);
+
+        // console.log("mapping");
+        // console.log(mappingSelection);
         const factRawData = this.filterFactData(rawData, mappingSelection);
 
+        // console.log("factRawData");
+        // console.log(factRawData);
         //Updated on 01-FEB-2024 Time 9:20 AM
         const replaceData = updateAssetIds(this._csvData, factRawData, this._props.dataMapping.DIM_ASSET);
         //const replaceData = updateAssetIds(this._csvData, factRawData, "DIM_ASSET");
         this.displayLoadingState();
 
-        //console.log(replaceData);
+        // console.log("replacedData");
+        // console.log(replaceData);
         const status = await this.fileLoad.createJob(model, jobType, mapping, replaceData);
 
         this.displayNormalState();
@@ -171,13 +179,13 @@ class WBDPlanning extends HTMLElement {
     }
 
     async getAssetAutoId(limit, prefix) {
-        const assetList = await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET');
+        const assetList = await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', prefix);
         this._autoIdList = generateAutoId(assetList, limit, prefix);
         return this._autoIdList;
     }
 
     async getProjectAutoId(limit, prefix) {
-        const projectList = await this.fileLoad.getApiData(this._props.modelId, 'DIM_PROJECT');
+        const projectList = await this.fileLoad.getApiData(this._props.modelId, 'DIM_PROJECT', prefix);
         return generateAutoId(projectList, limit, prefix);
     }
 
@@ -185,6 +193,8 @@ class WBDPlanning extends HTMLElement {
         const masterData = await this.fileLoad.getMasterDataAPI(this._props.modelId, dimensionId, filters);
         return masterData;
     }
+
+    /*
 
     async parseCSV() {
         const rawsData = this._rawsData;
@@ -234,6 +244,51 @@ class WBDPlanning extends HTMLElement {
         this._csvData = data;
         // this.clearFileInput();
         return data;
+    }
+    */
+
+    async parseCSV() {
+        var rawData = this._rawsData;
+        var projectLastIdPA = (await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'PA')).value[0].ID;
+        var projectLastIdAR = (await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'AR')).value[0].ID; //await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'AR').value[0].ID;
+        var projectColumnName = this._props.dataMapping.DIM_PROJECT; //"PROJECT ID";
+        var isAutoId = this._autoIdType;
+
+        // Parse the CSV data into an array of objects
+        var lines = rawData.split("\n");
+        var headers = lines[0].split(",");
+        var result = [];
+
+        for (var i = 1; i < lines.length; i++) {
+            var obj = {};
+            var currentLine = lines[i].split(",");
+
+            for (var j = 0; j < headers.length; j++) {
+                obj[headers[j].toLowerCase()] = currentLine[j] ?? '';
+            }
+
+            // Generate AUTOID based on PROJECT ID
+            var autoIdPrefix = currentLine[headers.indexOf(projectColumnName)].substring(0, 2) === 'PP' ? 'PA' : 'AR';
+            var nextAutoId = autoIdPrefix === 'PA' ? parseInt(projectLastIdPA.substring(2)) + 1 : parseInt(projectLastIdAR.substring(2)) + 1;
+            var autoId = autoIdPrefix + nextAutoId.toString().padStart(8, '0');
+
+            // Update projectLastId based on the generated AUTOID
+            if (autoIdPrefix === 'PA') {
+                projectLastIdPA = autoId;
+            } else {
+                projectLastIdAR = autoId;
+            }
+
+            // Add AUTOID to the object
+            if (isAutoId) {
+                obj['AUTOID'] = autoId;
+            }
+
+            result.push(obj);
+        }
+
+        this._csvData = result;
+        return result;
     }
 
 
