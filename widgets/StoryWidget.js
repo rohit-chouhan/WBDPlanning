@@ -146,22 +146,22 @@ class WBDPlanning extends HTMLElement {
             "JobSettings": {}
         };
 
-        // console.log("rawdata");
-        // console.log(rawData);
+        console.log("rawdata");
+        console.log(rawData);
 
-        // console.log("mapping");
-        // console.log(mappingSelection);
+        console.log("mapping");
+        console.log(mappingSelection);
         const factRawData = this.filterFactData(rawData, mappingSelection);
 
-        // console.log("factRawData");
-        // console.log(factRawData);
-        //Updated on 01-FEB-2024 Time 9:20 AM
+        console.log("factRawData");
+        console.log(factRawData);
+        // Updated on 01-FEB-2024 Time 9:20 AM
         const replaceData = updateAssetIds(this._csvData, factRawData, this._props.dataMapping.DIM_ASSET);
         //const replaceData = updateAssetIds(this._csvData, factRawData, "DIM_ASSET");
         this.displayLoadingState();
 
-        // console.log("replacedData");
-        // console.log(replaceData);
+        console.log("replacedData");
+        console.log(replaceData);
         const status = await this.fileLoad.createJob(model, jobType, mapping, replaceData);
 
         this.displayNormalState();
@@ -248,11 +248,18 @@ class WBDPlanning extends HTMLElement {
     */
 
     async parseCSV() {
+        var isAutoId = this._autoIdType ?? false;
+
         var rawData = this._rawsData;
-        var projectLastIdPA = (await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'PA')).value[0].ID;
-        var projectLastIdAR = (await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'AR')).value[0].ID; //await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'AR').value[0].ID;
-        var projectColumnName = this._props.dataMapping.DIM_PROJECT; //"PROJECT ID";
-        var isAutoId = this._autoIdType;
+        var projectLastIdPA = "";
+        var projectLastIdAR = "";
+        var projectColumnName = "";
+
+        if (isAutoId) {
+            projectLastIdPA = (await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'PA')).value[0].ID;
+            projectLastIdAR = (await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'AR')).value[0].ID; //await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'AR').value[0].ID;
+            projectColumnName = this._props.dataMapping.DIM_PROJECT;
+        }
 
         // Parse the CSV data into an array of objects
         var lines = rawData.split("\n");
@@ -267,23 +274,26 @@ class WBDPlanning extends HTMLElement {
                 obj[headers[j].toLowerCase()] = currentLine[j] ?? '';
             }
 
-            // Generate AUTOID based on PROJECT ID
-            var autoIdPrefix = currentLine[headers.indexOf(projectColumnName)].substring(0, 2) === 'PP' ? 'PA' : 'AR';
-            var nextAutoId = autoIdPrefix === 'PA' ? parseInt(projectLastIdPA.substring(2)) + 1 : parseInt(projectLastIdAR.substring(2)) + 1;
-            var autoId = autoIdPrefix + nextAutoId.toString().padStart(8, '0');
-
-            // Update projectLastId based on the generated AUTOID
-            if (autoIdPrefix === 'PA') {
-                projectLastIdPA = autoId;
-            } else {
-                projectLastIdAR = autoId;
-            }
-
-            // Add AUTOID to the object
             if (isAutoId) {
-                obj['AUTOID'] = autoId;
+                // Generate AUTOID based on PROJECT ID
+                var autoIdPrefix = currentLine[headers.indexOf(projectColumnName)].substring(0, 2) === 'PP' ? 'PA' : 'AR';
+                var nextAutoId = autoIdPrefix === 'PA' ? parseInt(projectLastIdPA.substring(2)) + 1 : parseInt(projectLastIdAR.substring(2)) + 1;
+                var autoId = autoIdPrefix + nextAutoId.toString().padStart(8, '0');
+
+                // Update projectLastId based on the generated AUTOID
+                if (autoIdPrefix === 'PA') {
+                    projectLastIdPA = autoId;
+                } else {
+                    projectLastIdAR = autoId;
+                }
+
+                // Add AUTOID to the object
+                if (isAutoId) {
+                    obj['AUTOID'] = autoId;
+                }
             }
 
+            // Add the object to the result array
             result.push(obj);
         }
 
