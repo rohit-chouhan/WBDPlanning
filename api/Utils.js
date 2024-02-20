@@ -28,7 +28,7 @@ const generateAutoId = (dataObject, numberOfIdNeed, prefix = '') => {
     return newIds;
 }
 
-const filterNewRecords = (rawData, newRecord) => {
+const filterNewRecords = (rawData, newRecord, assetIndex) => {
     // Parse CSV data into an array of objects
     // Split the CSV data into rows
     const rows = rawData.split('\n');
@@ -37,13 +37,14 @@ const filterNewRecords = (rawData, newRecord) => {
     const header = rows[0].split(',');
 
     // Find the index of ASSET_ID column
-    const assetIdIndex = header.indexOf('ASSET_ID');
+    // const assetIdIndex = header.indexOf('ASSET_ID');
+    const assetIdIndex = header.indexOf(assetIndex);
 
     // Filter rows based on ASSET_ID column value
     const filteredRows = rows.filter((row, index) => {
         if (index === 0) return true; // Include header row
         const columns = row.split(',');
-        return newRecord ? columns[assetIdIndex] === 'NEW' : columns[assetIdIndex] !== 'NEW';
+        return newRecord ? columns[assetIdIndex].toUpperCase() === 'NEW' : columns[assetIdIndex].toUpperCase() !== 'NEW';
     });
 
     // Join the filtered rows back into CSV format

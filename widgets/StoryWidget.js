@@ -237,7 +237,7 @@ class WBDPlanning extends HTMLElement {
     //Return only NEW one Assets
     async parseNewAssetCSV() {
         const isAutoId = true;
-        const rawData = filterNewRecords(this._rawsData, true);
+        const rawData = filterNewRecords(this._rawsData, true, this._props.dataMapping?.DIM_ASSET);
         let projectLastIdPA = "";
         let projectLastIdAR = "";
         let projectColumnName = "";
@@ -287,7 +287,7 @@ class WBDPlanning extends HTMLElement {
 
     //Return which asset don't have NEW word in Column
     async parseExistAssetCSV() {
-        const rawData = filterNewRecords(this._rawsData, false);
+        const rawData = filterNewRecords(this._rawsData, false, this._props.dataMapping?.DIM_ASSET);
 
         const lines = rawData.split("\n");
         const headers = lines[0].split(",");
