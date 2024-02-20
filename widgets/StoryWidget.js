@@ -1,6 +1,6 @@
 import { StoryTemplate } from "../template/StoryTemplate";
 import { FileLoad } from "../api/FileLoad";
-import { getScriptPromisify, generateAutoId, updateAssetIds } from "../api/Utils";
+import { getScriptPromisify, generateAutoId, objectToCSV, filterNewRecords } from "../api/Utils";
 
 getScriptPromisify('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js');
 
@@ -21,16 +21,16 @@ class WBDPlanning extends HTMLElement {
         this._typeSelect = this._shadowRoot.querySelector("#type-select");
         this._mainBox = this._shadowRoot.querySelector("#main-box");
 
-        // this._fileInput.addEventListener("click", () => this.clearFileInput());
+        this._fileInput.addEventListener("click", () => this.clearFileInput());
         this._fileInput.addEventListener("change", () => this.handleFileSelect()); //file select
         this._typeSelect.addEventListener("change", () => this.handleUpload()); //select option
 
-        this._generatedId;
-        this._assetList;
         this._rawsData;
         this._autoIdType = false;
         this._autoIdList;
-        this._csvData;
+        this._csvData = null;
+        this._csvNewData = null;
+        this._csvExistData = null;
 
         this.displayLoadingState();
     }
@@ -134,7 +134,6 @@ class WBDPlanning extends HTMLElement {
     }
 
     async uploadData() {
-        const rawData = this._rawsData;
         const model = this._props.modelId;
         const jobType = 'factData'; //factData, masterData, masterFactData
         const mappingSelection = this._props.dataMapping || {};
@@ -143,26 +142,16 @@ class WBDPlanning extends HTMLElement {
         const mapping = {
             "Mapping": mappingSelection,
             "DefaultValues": defaultSelection,
-            "JobSettings": {}
+            "JobSettings": {
+                "executeWithFailedRows": true
+            }
         };
 
-        console.log("rawdata");
-        console.log(rawData);
+        this._csvData = this._csvNewData.concat(this._csvExistData);
 
-        console.log("mapping");
-        console.log(mappingSelection);
-        const factRawData = this.filterFactData(rawData, mappingSelection);
+        const factRawData = objectToCSV(this._csvData, mappingSelection);
 
-        console.log("factRawData");
-        console.log(factRawData);
-        // Updated on 01-FEB-2024 Time 9:20 AM
-        const replaceData = updateAssetIds(this._csvData, factRawData, this._props.dataMapping.DIM_ASSET);
-        //const replaceData = updateAssetIds(this._csvData, factRawData, "DIM_ASSET");
-        this.displayLoadingState();
-
-        console.log("replacedData");
-        console.log(replaceData);
-        const status = await this.fileLoad.createJob(model, jobType, mapping, replaceData);
+        const status = await this.fileLoad.createJob(model, jobType, mapping, factRawData);
 
         this.displayNormalState();
         if (status) {
@@ -194,115 +183,129 @@ class WBDPlanning extends HTMLElement {
         return masterData;
     }
 
-    /*
 
+    //Return Excel data as OBJECT, supported with AutoId true and false
     async parseCSV() {
-        const rawsData = this._rawsData;
-        var autoIdStartFrom = ''; // Use await here
-        const autoIdType = this._autoIdType;
-        if (autoIdType) {
-            autoIdStartFrom = (await this.getAssetAutoId(1, 'PA'))[0];
-        }
-        const rows = rawsData.split('\n');
-        const headers = rows[0].split(',');
-
-        const data = [];
-        let autoIdCounter = autoIdType && autoIdStartFrom ? parseInt(autoIdStartFrom.match(/\d+$/)[0]) : null;
-
-        autoIdCounter = autoIdCounter - autoIdCounter;
-
-        for (let i = 1; i < rows.length; i++) {
-            const values = rows[i].split(',');
-            const entry = {};
-
-            if (autoIdType && autoIdStartFrom) {
-                const prefix = autoIdStartFrom.replace(/\d+$/, '');
-                const lastNumericPart = autoIdStartFrom.match(/\d+$/)[0];
-                const incrementedId = String(parseInt(lastNumericPart) + autoIdCounter).padStart(lastNumericPart.length, '0');
-                entry.AUTOID = `${prefix}${incrementedId}`;
-                autoIdCounter++;
-            }
-
-            for (let j = 0; j < headers.length; j++) {
-                entry[headers[j].toLowerCase()] = values[j] ?? '';
-            }
-
-            //AR & PA CODE
-            if (autoIdType && autoIdStartFrom) {
-                if (
-                    entry[this._props.dataMapping.DIM_PROJECT.toLowerCase()] &&
-                    entry[this._props.dataMapping.DIM_PROJECT.toLowerCase()].startsWith("DL")
-                ) {
-                    entry["AUTOID"] = entry["AUTOID"].replace("PA", "AR");
-                }
-            }
-            //AR & PA CODE
-
-            data.push(entry);
-        }
-
-        this._csvData = data;
-        // this.clearFileInput();
-        return data;
-    }
-    */
-
-    async parseCSV() {
-        var isAutoId = this._autoIdType ?? false;
-
-        var rawData = this._rawsData;
-        var projectLastIdPA = "";
-        var projectLastIdAR = "";
-        var projectColumnName = "";
+        const isAutoId = this._autoIdType || false;
+        const rawData = this._rawsData;
+        let projectLastIdPA = "";
+        let projectLastIdAR = "";
+        let projectColumnName = "";
 
         if (isAutoId) {
-            projectLastIdPA = (await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'PA')).value[0].ID;
-            projectLastIdAR = (await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'AR')).value[0].ID; //await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'AR').value[0].ID;
-            projectColumnName = this._props.dataMapping.DIM_PROJECT;
+            const assetDataPA = await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'PA');
+            const assetDataAR = await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'AR');
+            projectLastIdPA = assetDataPA?.value[0]?.ID || "";
+            projectLastIdAR = assetDataAR?.value[0]?.ID || "";
+            projectColumnName = this._props.dataMapping?.DIM_PROJECT || "";
         }
 
-        // Parse the CSV data into an array of objects
-        var lines = rawData.split("\n");
-        var headers = lines[0].split(",");
-        var result = [];
+        const lines = rawData.split("\n");
+        const headers = lines[0].split(",");
+        const result = [];
 
-        for (var i = 1; i < lines.length; i++) {
-            var obj = {};
-            var currentLine = lines[i].split(",");
+        for (let i = 1; i < lines.length; i++) {
+            const obj = {};
+            const currentLine = lines[i].split(",");
 
-            for (var j = 0; j < headers.length; j++) {
-                obj[headers[j].toLowerCase()] = currentLine[j] ?? '';
+            for (let j = 0; j < headers.length; j++) {
+                obj[headers[j]] = currentLine[j] || '';
             }
 
             if (isAutoId) {
-                // Generate AUTOID based on PROJECT ID
-                var autoIdPrefix = currentLine[headers.indexOf(projectColumnName)].substring(0, 2) === 'PP' ? 'PA' : 'AR';
-                var nextAutoId = autoIdPrefix === 'PA' ? parseInt(projectLastIdPA.substring(2)) + 1 : parseInt(projectLastIdAR.substring(2)) + 1;
-                var autoId = autoIdPrefix + nextAutoId.toString().padStart(8, '0');
+                const columnIndex = headers.indexOf(projectColumnName);
+                const autoIdPrefix = currentLine[columnIndex]?.substring(0, 2) === 'PP' ? 'PA' : 'AR';
+                const nextAutoId = autoIdPrefix === 'PA' ? parseInt(projectLastIdPA.substring(2)) + 1 : parseInt(projectLastIdAR.substring(2)) + 1;
+                const autoId = autoIdPrefix + nextAutoId.toString().padStart(8, '0');
 
-                // Update projectLastId based on the generated AUTOID
                 if (autoIdPrefix === 'PA') {
                     projectLastIdPA = autoId;
                 } else {
                     projectLastIdAR = autoId;
                 }
 
-                // Add AUTOID to the object
-                if (isAutoId) {
-                    obj['AUTOID'] = autoId;
-                }
+                obj['AUTOID'] = autoId;
             }
 
-            // Add the object to the result array
             result.push(obj);
         }
 
-        this._csvData = result;
         return result;
     }
 
 
-    /* Json based Functions*/
+    //Return only NEW one Assets
+    async parseNewAssetCSV() {
+        const isAutoId = true;
+        const rawData = filterNewRecords(this._rawsData, true);
+        let projectLastIdPA = "";
+        let projectLastIdAR = "";
+        let projectColumnName = "";
+
+        if (isAutoId) {
+            const assetDataPA = await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'PA');
+            const assetDataAR = await this.fileLoad.getApiData(this._props.modelId, 'DIM_ASSET', 'AR');
+            projectLastIdPA = assetDataPA?.value[0]?.ID || "";
+            projectLastIdAR = assetDataAR?.value[0]?.ID || "";
+            projectColumnName = this._props.dataMapping?.DIM_PROJECT || "";
+        }
+
+        const lines = rawData.split("\n");
+        const headers = lines[0].split(",");
+        const result = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const obj = {};
+            const currentLine = lines[i].split(",");
+
+            for (let j = 0; j < headers.length; j++) {
+                obj[headers[j]] = currentLine[j] || '';
+            }
+
+            if (isAutoId) {
+                const columnIndex = headers.indexOf(projectColumnName);
+                const autoIdPrefix = currentLine[columnIndex]?.substring(0, 2) === 'PP' ? 'PA' : 'AR';
+                const nextAutoId = autoIdPrefix === 'PA' ? parseInt(projectLastIdPA.substring(2)) + 1 : parseInt(projectLastIdAR.substring(2)) + 1;
+                const autoId = autoIdPrefix + nextAutoId.toString().padStart(8, '0');
+
+                if (autoIdPrefix === 'PA') {
+                    projectLastIdPA = autoId;
+                } else {
+                    projectLastIdAR = autoId;
+                }
+
+                //obj['AUTOID'] = autoId;
+                obj[this._props.dataMapping?.DIM_ASSET] = autoId;
+            }
+
+            result.push(obj);
+        }
+
+        this._csvNewData = result;
+        return result;
+    }
+
+    //Return which asset don't have NEW word in Column
+    async parseExistAssetCSV() {
+        const rawData = filterNewRecords(this._rawsData, false);
+
+        const lines = rawData.split("\n");
+        const headers = lines[0].split(",");
+        const result = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const obj = {};
+            const currentLine = lines[i].split(",");
+
+            for (let j = 0; j < headers.length; j++) {
+                obj[headers[j]] = currentLine[j] || '';
+            }
+            result.push(obj);
+        }
+
+        this._csvExistData = result;
+        return result;
+    }
 
     onCustomWidgetBeforeUpdate(changedProperties) {
         this._props = { ...this._props, ...changedProperties };

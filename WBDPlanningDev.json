@@ -108,7 +108,7 @@
     },
     "getMasterData": {
       "returnType": "Selection[]",
-      "description": "Get auto generated id based on latest data",
+      "description": "Return master data based on filter",
       "parameters": [
         {
           "name": "dimensionId",
@@ -123,6 +123,14 @@
     "parseCSV": {
       "returnType": "Selection[]",
       "description": "Get uploaded master data"
+    },
+    "parseNewAssetCSV": {
+      "returnType": "Selection[]",
+      "description": "Get uploaded master data only for New Assets"
+    },
+    "parseExistAssetCSV": {
+      "returnType": "Selection[]",
+      "description": "Get uploaded master data only for Exist Assets"
     },
     "uploadData": {
       "returnType": "boolean",

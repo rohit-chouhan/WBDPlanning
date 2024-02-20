@@ -28,32 +28,48 @@ const generateAutoId = (dataObject, numberOfIdNeed, prefix = '') => {
     return newIds;
 }
 
+const filterNewRecords = (rawData, newRecord) => {
+    // Parse CSV data into an array of objects
+    // Split the CSV data into rows
+    const rows = rawData.split('\n');
 
-const updateAssetIds = (mapping, csvRaw, replaceToColumn) => {
-    // Parse CSV and convert it into an array of objects
-    var csvArray = csvRaw.split('\n').map(row => row.split(','));
+    // Extract the header row
+    const header = rows[0].split(',');
 
-    // Find the index of "ASSET_ID" column
-    var assetIndex = csvArray[0].indexOf(replaceToColumn);
+    // Find the index of ASSET_ID column
+    const assetIdIndex = header.indexOf('ASSET_ID');
 
-    // Update the "ASSET_ID" values with corresponding "AUTOID" values
-    for (var i = 1; i < csvArray.length; i++) {
-        var assetValue = csvArray[i][assetIndex];
-        var mappingEntry = mapping.find(entry => entry.asset_id === assetValue);
-        if (mappingEntry.AUTOID && mappingEntry) {
-            csvArray[i][assetIndex] = mappingEntry.AUTOID;
-        }
-    }
+    // Filter rows based on ASSET_ID column value
+    const filteredRows = rows.filter((row, index) => {
+        if (index === 0) return true; // Include header row
+        const columns = row.split(',');
+        return newRecord ? columns[assetIdIndex] === 'NEW' : columns[assetIdIndex] !== 'NEW';
+    });
 
-    // Convert the array of arrays back to CSV format
-    var updatedCsvRaw = csvArray.map(row => row.join(',')).join('\n');
+    // Join the filtered rows back into CSV format
+    const filteredData = filteredRows.join('\n');
 
-    return updatedCsvRaw;
+    return filteredData;
+}
+
+const objectToCSV = (obj, mapping) => {
+    var mappedFields = Object.values(mapping);
+
+    // Constructing CSV header based on the mapped fields
+    var csv = mappedFields.join(",") + "\n";
+
+    // Generating CSV rows
+    obj.forEach(item => {
+        csv += mappedFields.map(field => item[field]).join(",") + "\n";
+    });
+
+    return csv;
 }
 
 export {
+    filterNewRecords,
     getScriptPromisify,
     getStylesheetPromisify,
     generateAutoId,
-    updateAssetIds
+    objectToCSV
 }
