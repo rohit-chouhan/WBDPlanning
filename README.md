@@ -8,7 +8,7 @@ Copyright © 2024 Deloitte and Warner Bros. Discovery. All rights reserved.
 
 This project is a custom widget developed for the Deloitte and Warner Bros. Discovery SAC-P project. This custom widget is intended solely for commercial use and may not be used for personal purposes. Do not reuse or distribute this custom widget project without permission.
 
-**Developed By: ** [Rohit Chouhan](https://linkedin.com/in/itsrohitchouhan "Rohit Chouhan") 
-**Issue By: ** [Deloitte ©  ](https://deloitte.com) 
+**Developed By:** [Rohit Chouhan](https://linkedin.com/in/itsrohitchouhan "Rohit Chouhan") 
+**Issue By:** [Deloitte ©  ](https://deloitte.com) 
 
 For inquiries, please contact Rohit Chouhan at [https://linkedin.com/in/itsrohitchouhan](https://linkedin.com/in/itsrohitchouhan).
