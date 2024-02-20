@@ -209,7 +209,7 @@ class WBDPlanning extends HTMLElement {
             const currentLine = lines[i].split(",");
 
             for (let j = 0; j < headers.length; j++) {
-                obj[headers[j]] = currentLine[j] || '';
+                obj[headers[j].toLowerCase()] = currentLine[j] || '';
             }
 
             if (isAutoId) {
