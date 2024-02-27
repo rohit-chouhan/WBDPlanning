@@ -186,20 +186,30 @@ class FileLoad {
     }
 
     async getApiData(modelId, dimensionId, prefix) {
-        try {
-            const filter = dimensionId === 'DIM_PROJECT' ? 'ATR_PRJ_ORIGINATING_NETWORK' : 'ATR_AST_PROJECT_ID';
-            const apiUrl = `${this.URL}/api/v1/dataexport/providers/sac/${modelId}/${dimensionId}Master?$orderby=ID desc&$top=10&$filter=${filter} ne '' and startswith(ID, '${prefix}')&$select=ID`;
+        const MAX_RETRIES = 3; // Maximum number of retries
+        let retryCount = 0;
 
-            const headers = {
-                'Content-Type': 'application/json' // Replace with the actual CSRF token
-            };
+        while (retryCount < MAX_RETRIES) {
+            try {
+                const filter = dimensionId === 'DIM_PROJECT' ? 'ATR_PRJ_ORIGINATING_NETWORK' : 'ATR_AST_PROJECT_ID';
+                const apiUrl = `${this.URL}/api/v1/dataexport/providers/sac/${modelId}/${dimensionId}Master?$orderby=ID desc&$top=10&$filter=${filter} ne '' and startswith(ID, '${prefix}')&$select=ID`;
 
-            const response = await axios.get(apiUrl, { headers });
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            return [];
+                const headers = {
+                    'Content-Type': 'application/json' // Replace with the actual CSRF token
+                };
+
+                const response = await axios.get(apiUrl, { headers });
+                return response.data;
+            } catch (error) {
+                if (error.response && error.response.status === 500) {
+                    console.error('Internal Server Error: Retrying...');
+                    retryCount++;
+                }
+            }
         }
+
+        console.error('Exceeded maximum retries.');
+        return [];
     }
 
 
