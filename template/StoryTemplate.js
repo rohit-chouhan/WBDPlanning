@@ -70,7 +70,7 @@ export const StoryTemplate = ` <style>
   </div>
   <div id="uploading">
     <center>
-       <img width="70" style="margin-left:-35px;" src="https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.11/dist/flash-loading.gif" /> 
+       <img width="70" style="margin-left:-35px;" src="https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.12/dist/flash-loading.gif" /> 
        <span style="font-size:12px">I'm on my way, please wait...</span>
     </center>
   </div>

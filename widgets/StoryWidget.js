@@ -178,6 +178,11 @@ class WBDPlanning extends HTMLElement {
         return generateAutoId(projectList, limit, prefix);
     }
 
+    async getInvGroupAutoId(limit, prefix) {
+        const offerList = await this.fileLoad.getApiData(this._props.modelId, 'DIM_INV_GROUP', prefix);
+        return generateAutoId(offerList, limit, prefix);
+    }
+
     async getMasterData(dimensionId, filters) {
         const masterData = await this.fileLoad.getMasterDataAPI(this._props.modelId, dimensionId, filters);
         return masterData;

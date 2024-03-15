@@ -1,13 +1,13 @@
 {
   "id": "com.rohitchouhan.wbdplanning",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "name": "WBD Planning",
   "description": "A Planning Widget of Warner Bros Discovery Project",
   "newInstancePrefix": "WBDPlanning",
   "vendor": "Deloitte | rohchouhan@deloitte.com",
   "eula": "Deloitte",
   "license": "MIT",
-  "icon": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.11/dist/icon.png",
+  "icon": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.12/dist/icon.png",
   "imports": [
     "datasource",
     "planning-model"
@@ -16,8 +16,8 @@
     {
       "kind": "main",
       "tag": "com-rohitchouhan-wbdplanning",
-      "url": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.11/dist/WBDPlanning.bundle.js",
-      "integrity": "sha256-nmNPwypoBJKGTGJi7WFA7/ZMmyiM0Tov7UCDtbqgsVw=",
+      "url": "https://cdn.jsdelivr.net/gh/rohit-chouhan/WBDPlanning@1.0.12/dist/WBDPlanning.bundle.js",
+      "integrity": "sha256-VJmGqe17XfALvcGSQbJ0EjS0UZUUVov2Iank9aHPKbM=",
       "ignoreIntegrity": false
     }
   ],
@@ -93,6 +93,20 @@
       ]
     },
     "getAssetAutoId": {
+      "returnType": "string[]",
+      "description": "Get auto generated id based on latest data",
+      "parameters": [
+        {
+          "name": "limit",
+          "type": "integer"
+        },
+        {
+          "name": "prefix",
+          "type": "string"
+        }
+      ]
+    },
+    "getInvGroupAutoId": {
       "returnType": "string[]",
       "description": "Get auto generated id based on latest data",
       "parameters": [
